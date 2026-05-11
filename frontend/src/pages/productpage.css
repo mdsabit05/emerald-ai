@@ -1,0 +1,397 @@
+.review-user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.review-avatar {
+  width: 52px;
+  height: 52px;
+
+  border-radius: 50%;
+
+  object-fit: contain;
+
+  border: 2px solid rgba(19, 46, 36, 0.08);
+
+  background: #f5f5f5;
+}
+
+.review-user-name {
+  font-size: 1rem;
+  margin-bottom: 4px;
+
+  color: var(--emerald);
+
+  font-weight: 600;
+}
+
+/* =========================================
+   RELATED PRODUCTS SECTION
+========================================= */
+
+.related-products-section {
+  margin-top: 120px;
+}
+
+.related-header {
+  margin-bottom: 50px;
+}
+
+.related-header h2 {
+  font-size: clamp(2.4rem, 5vw, 4rem);
+
+  line-height: 1.05;
+
+  color: var(--emerald);
+
+  margin-bottom: 14px;
+
+  letter-spacing: -1px;
+}
+
+.related-header p {
+  font-size: 1.05rem;
+
+  color: #666;
+}
+
+.related-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(240px, 320px));
+   justify-content: center;
+  gap: 28px;
+
+  align-items: start;
+}
+
+/* =========================================
+   RELATED CARD
+========================================= */
+
+.related-card {
+  position: relative;
+   width: 100%;
+
+  max-width: 320px;
+
+  background: white;
+
+  border-radius: 26px;
+
+  overflow: hidden;
+
+  text-decoration: none;
+
+  border: 1px solid rgba(19, 46, 36, 0.06);
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+
+  cursor: pointer;
+}
+
+.related-card:hover {
+  transform:
+    translateY(-6px);
+
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.08);
+}
+
+/* =========================================
+   IMAGE WRAP
+========================================= */
+
+.related-image-wrap {
+  position: relative;
+
+  height: 280px;
+
+  overflow: hidden;
+
+  background: #f6f5f2;
+}
+
+.related-image-wrap img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  display: block;
+ padding: 18px;
+  transition:
+    transform 0.45s ease;
+     position: relative;
+
+  isolation: isolate;
+}
+.related-image-wrap::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      110deg,
+      #f5f5f5 8%,
+      #ffffff 18%,
+      #f5f5f5 33%
+    );
+
+  background-size: 200% 100%;
+
+  animation:
+    shimmer 1.6s linear infinite;
+
+  z-index: 0;
+}
+
+.related-card:hover
+.related-image-wrap img {
+  transform: scale(1.03);
+  position: relative;
+
+  z-index: 2;
+}
+
+@keyframes shimmer {
+
+  to {
+    background-position-x: -200%;
+  }
+}
+
+/* =========================================
+   WISHLIST BUTTON
+========================================= */
+
+.related-image-wrap .wishlist-btn {
+  position: absolute;
+
+  top: 18px;
+  right: 18px;
+
+  width: 50px;
+  height: 50px;
+
+  border-radius: 50%;
+
+  border: none;
+
+  background: rgba(255,255,255,0.95);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  z-index: 20;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.08);
+
+  transition:
+    all 0.3s ease;
+}
+
+.related-image-wrap
+.wishlist-btn:hover {
+  transform: scale(1.08);
+}
+
+.related-image-wrap
+.wishlist-btn.active {
+  color: #d7263d;
+}
+
+/* =========================================
+   QUICK ADD BUTTON
+========================================= */
+
+.related-card .quick-add-overlay {
+  position: absolute;
+
+  z-index: 10;
+
+  pointer-events: none;
+}
+
+.related-card .btn-quick-add {
+  width: 90%;
+
+  height: 44px;
+
+  border: none;
+
+  background: rgba(255,255,255,0.96);
+
+  color: #132e24;
+
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  pointer-events: auto;
+
+  transition:
+    all 0.25s ease;
+}
+.related-card::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0,0,0,0.04),
+      transparent 40%
+    );
+
+  opacity: 0;
+
+  transition:
+    opacity 0.35s ease;
+
+  pointer-events: none;
+}
+
+.related-card:hover::after {
+  opacity: 1;
+}
+.related-card .btn-quick-add:hover {
+  background: #132e24;
+  color: white;
+}
+.related-card:hover
+.related-info {
+  transform:
+    translateY(-2px);
+}
+
+.related-info p {
+  transition:
+    color 0.3s ease;
+}
+
+.related-card:hover
+.related-info p {
+  color: var(--emerald);
+}
+
+/* =========================================
+   RELATED INFO
+========================================= */
+
+
+
+.related-info {
+  display: flex;
+  
+  flex-direction: column;
+  padding: 24px;
+
+  gap: 4px;
+
+  transform:
+    translateY(0);
+
+  transition:
+    transform 0.35s ease;
+}
+
+.related-info h3 {
+  font-size: 1.5rem;
+
+  color: var(--emerald);
+
+  margin-bottom: 12px;
+
+  line-height: 1.2;
+}
+.related-info p {
+  font-size: 1.05rem;
+
+  font-weight: 600;
+
+  letter-spacing: -0.2px;
+}
+
+.related-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-bottom: 12px;
+
+  color: #666;
+
+  font-size: 0.9rem;
+}
+
+.related-rating small {
+  color: #999;
+}
+
+.related-info h3 {
+  font-size: 1.15rem;
+
+  font-weight: 600;
+
+  letter-spacing: -0.3px;
+
+  line-height: 1.35;
+  font-weight: 500;
+
+  color: #222;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .related-products-section {
+    margin-top: 90px;
+  }
+
+  .related-grid {
+    grid-template-columns: 0.5fr;
+
+    gap: 24px;
+  }
+
+  .related-image-wrap {
+    height: 240px;
+  }
+
+  .related-info {
+    padding: 20px;
+  }
+
+  
+ 
+
+  .related-card .btn-quick-add {
+    height: 48px;
+
+    font-size: 0.72rem;
+
+    letter-spacing: 1.5px;
+  }
+}

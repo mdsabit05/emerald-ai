@@ -1,0 +1,9 @@
+name = "emerald-green-api"
+main = "src/index.ts"
+compatibility_date = "2026-05-06"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "emerald-green-db"
+database_id = "1f290ecf-23e4-4414-8049-bc227aff8d13"
+migrations_dir = "drizzle"
