@@ -2,6 +2,10 @@ name = "emerald-green-api"
 main = "src/index.ts"
 compatibility_date = "2026-05-06"
 
+[dev]
+ip = "0.0.0.0"
+port = 47832
+
 [[d1_databases]]
 binding = "DB"
 database_name = "emerald-green-db"

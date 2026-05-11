@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8787";
+const API_URL = "/api";
 
 export async function getProducts() {
   const res = await fetch(`${API_URL}/products`);
@@ -61,7 +61,7 @@ export async function createOrder(
 
 export async function getMyOrders(token) {
   const res = await fetch(
-    "http://localhost:8787/orders/my-orders",
+    `${API_URL}/orders/my-orders`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
