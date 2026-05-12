@@ -364,6 +364,20 @@
   margin: 0;
 }
 
+.nav-admin-link {
+  color: #132e24 !important;
+  font-weight: 700 !important;
+  border: 1.5px solid #132e24;
+  border-radius: 6px;
+  padding: 4px 12px !important;
+  transition: 0.2s ease;
+}
+
+.nav-admin-link:hover {
+  background: #132e24 !important;
+  color: white !important;
+}
+
 .cart-btn {
   display: flex;
   align-items: center;

@@ -268,6 +268,18 @@ const { user } =
               </Link>
             </li>
 
+            {user?.publicMetadata?.role === "admin" && (
+              <li>
+                <Link
+                  to="/admin"
+                  onClick={closeMenu}
+                  className="nav-admin-link"
+                >
+                  Admin
+                </Link>
+              </li>
+            )}
+
           </ul>
 
         </nav>
