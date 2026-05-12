@@ -197,6 +197,10 @@ export function CartProvider({
     );
   }
 
+  function clearCart() {
+    setCartItems([]);
+  }
+
   /* =========================================
      TOTALS
   ========================================= */
@@ -239,6 +243,8 @@ export function CartProvider({
         increaseQuantity,
 
         decreaseQuantity,
+
+        clearCart,
 
         cartTotal,
 
