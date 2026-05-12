@@ -49,9 +49,9 @@ export default function Home() {
         <div className="hero-slider-container">
           <div className="slider-track" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
             {slides.map((slide, i) => (
-              <div key={i} className={`slide ${currentSlide === i ? 'active' : ''}`}>
-                {slide.imageUrl
-                  ? <img src={slide.imageUrl} alt={slide.label} />
+              <div key={slide.id} className={`slide ${currentSlide === i ? 'active' : ''}`}>
+                {slide.displayImage
+                  ? <img src={slide.displayImage} alt={slide.label} />
                   : <div className="slide-placeholder" />
                 }
                 <div className="slide-overlay"><span className="slide-text">{slide.label}</span></div>

@@ -1,20 +1,36 @@
 import { Hono } from "hono";
-import { eq } from "drizzle-orm";
+import { eq, asc } from "drizzle-orm";
 import { createDB } from "../db";
-import { sliderSlides } from "../db/schema";
+import { sliderSlides, products } from "../db/schema";
 import { authMiddleware } from "../middleware/auth";
 import { adminMiddleware } from "../middleware/admin";
 
 const sliderRoute = new Hono();
 
-// GET all slides (public)
+// GET all slides (public) — includes product image and name when linked
 sliderRoute.get("/", async (c) => {
   const db = createDB(c.env.DB);
-  const slides = await db
-    .select()
+  const rows = await db
+    .select({
+      id: sliderSlides.id,
+      position: sliderSlides.position,
+      label: sliderSlides.label,
+      imageUrl: sliderSlides.imageUrl,
+      productId: sliderSlides.productId,
+      productImageUrl: products.imageUrl,
+      productName: products.name,
+    })
     .from(sliderSlides)
-    .orderBy(sliderSlides.position);
-  return c.json({ success: true, data: slides });
+    .leftJoin(products, eq(sliderSlides.productId, products.id))
+    .orderBy(asc(sliderSlides.position));
+
+  // Resolve display image: custom upload first, then product image
+  const data = rows.map((row) => ({
+    ...row,
+    displayImage: row.imageUrl || row.productImageUrl || "",
+  }));
+
+  return c.json({ success: true, data });
 });
 
 // PUT update a slide (admin only)
