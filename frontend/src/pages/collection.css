@@ -59,10 +59,16 @@
     z-index: 10;
 }
 
+.catalog-img-wrapper > div:not(.quick-add-overlay) {
+    width: 100%;
+    height: 100%;
+}
+
 .catalog-img-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
+    display: block;
     transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
@@ -290,6 +296,22 @@
 
 .product-rating small {
   color: #999;
+}
+
+.stock-label {
+  font-size: 0.78rem;
+  color: #888;
+  margin-top: 4px;
+}
+
+.stock-label[data-out] {
+  color: #c0392b;
+}
+
+.btn-out-of-stock {
+  background-color: #ddd !important;
+  color: #999 !important;
+  cursor: not-allowed !important;
 }
 
 .quick-add-overlay {

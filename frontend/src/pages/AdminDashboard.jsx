@@ -9,6 +9,8 @@ import {
   deleteProduct,
   createProduct,
   updateProduct,
+  getSlides,
+  updateSlide,
 } from "../lib/api";
 
 export default function AdminDashboard() {
@@ -30,6 +32,9 @@ export default function AdminDashboard() {
   const [uploadingImage,
     setUploadingImage] =
     useState(false);
+
+  const [sliderSlides, setSliderSlides] = useState([]);
+  const [uploadingSlide, setUploadingSlide] = useState(null);
 
   const [productForm, setProductForm] =
     useState({
@@ -61,6 +66,67 @@ const showToast = (message, type = "success") => {
     });
   }, 3000);
 };
+
+  // SLIDER IMAGE UPLOAD
+  async function handleSlideImageUpload(e, slide) {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      setUploadingSlide(slide.id);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "ecommerce_upload");
+      const res = await fetch("https://api.cloudinary.com/v1_1/dypqnj5e9/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!data.secure_url) throw new Error("Upload failed");
+      const token = await getToken();
+      const updated = await updateSlide(token, slide.id, {
+        label: slide.label,
+        imageUrl: data.secure_url,
+        productId: slide.productId,
+      });
+      setSliderSlides((prev) => prev.map((s) => s.id === slide.id ? updated : s));
+      showToast("Slide image updated!");
+    } catch (err) {
+      console.error(err);
+      showToast("Image upload failed", "error");
+    } finally {
+      setUploadingSlide(null);
+    }
+  }
+
+  async function handleSlideProductChange(slide, productId) {
+    try {
+      const token = await getToken();
+      const updated = await updateSlide(token, slide.id, {
+        label: slide.label,
+        imageUrl: slide.imageUrl,
+        productId: productId ? Number(productId) : null,
+      });
+      setSliderSlides((prev) => prev.map((s) => s.id === slide.id ? updated : s));
+      showToast("Slide updated!");
+    } catch (err) {
+      showToast("Failed to update slide", "error");
+    }
+  }
+
+  async function handleSlideRemoveImage(slide) {
+    try {
+      const token = await getToken();
+      const updated = await updateSlide(token, slide.id, {
+        label: slide.label,
+        imageUrl: "",
+        productId: slide.productId,
+      });
+      setSliderSlides((prev) => prev.map((s) => s.id === slide.id ? updated : s));
+      showToast("Image removed!");
+    } catch (err) {
+      showToast("Failed to remove image", "error");
+    }
+  }
 
   // IMAGE UPLOAD
   async function handleImageUpload(e) {
@@ -112,19 +178,18 @@ const showToast = (message, type = "success") => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const token = await getToken({
-          template: "default",
-        });
+        const token = await getToken();
 
         const ordersData =
           await getAllOrders(token);
 
         setOrders(ordersData);
 
-        const productsData =
-          await getProducts();
-
+        const productsData = await getProducts();
         setProducts(productsData);
+
+        const slidesData = await getSlides();
+        setSliderSlides(slidesData);
 
       } catch (err) {
         console.error(err);
@@ -358,6 +423,13 @@ const showToast = (message, type = "success") => {
           Products
         </button>
 
+        <button
+          className={activeTab === "slider" ? "active-tab" : ""}
+          onClick={() => setActiveTab("slider")}
+        >
+          Slider Images
+        </button>
+
       </div>
 
       {/* ORDERS */}
@@ -514,6 +586,13 @@ const showToast = (message, type = "success") => {
                     e.target.value,
                 })
               }
+              style={{
+                borderColor:
+                  productForm.description.length > 0 &&
+                  productForm.description.length < 10
+                    ? "#e53e3e"
+                    : "",
+              }}
             />
 
             <input
@@ -706,6 +785,62 @@ const showToast = (message, type = "success") => {
 
         </div>
       )}
+      {/* SLIDER IMAGES */}
+      {activeTab === "slider" && (
+        <div className="admin-slider-section">
+          <h2 className="product-heading">Homepage Slider Images</h2>
+          <p style={{ color: "#888", marginBottom: "24px", fontSize: "0.9rem" }}>
+            Upload images and link each slide to a product. The "Order Now" button on the homepage will go to that product.
+          </p>
+          <div className="slider-admin-grid">
+            {sliderSlides.map((slide, i) => (
+              <div key={slide.id} className="slider-admin-card">
+                <div className="slider-admin-preview">
+                  {slide.imageUrl
+                    ? <img src={slide.imageUrl} alt={`Slide ${i + 1}`} />
+                    : <div className="slider-admin-empty">No image</div>
+                  }
+                </div>
+                <div className="slider-admin-controls">
+                  <span className="section-label">Slide {i + 1} — {slide.label}</span>
+
+                  <select
+                    className="slider-label-input"
+                    value={slide.productId ?? ""}
+                    onChange={(e) => handleSlideProductChange(slide, e.target.value)}
+                  >
+                    <option value="">— No product linked —</option>
+                    {products.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+
+                  <label className="upload-box">
+                    {uploadingSlide === slide.id ? "Uploading..." : "Upload Image"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleSlideImageUpload(e, slide)}
+                      hidden
+                    />
+                  </label>
+
+                  {slide.imageUrl && (
+                    <button
+                      type="button"
+                      className="delete-btn"
+                      onClick={() => handleSlideRemoveImage(slide)}
+                    >
+                      Remove Image
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {
   toast.show && (
     <div className={`toast-message ${toast.type}`}>

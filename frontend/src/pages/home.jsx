@@ -1,10 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getSlides } from '../lib/api';
+
+const defaultSlides = [
+  { id: 1, label: "The Signature 25g Bar", imageUrl: "", productId: null },
+  { id: 2, label: "The Emerald's", imageUrl: "", productId: null },
+];
 
 export default function Home() {
+  const [slides, setSlides] = useState(defaultSlides);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [progress, setProgress] = useState(0);
-  const totalSlides = 2;
+  const totalSlides = slides.length;
+
+  useEffect(() => {
+    getSlides().then(setSlides).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const slideDuration = 5000;
@@ -32,30 +43,34 @@ export default function Home() {
           <h1>Pure organic,<br /><i>elevated.</i></h1>
           <p>We believe true luxury lies in the details. Uncompromising quality and meticulously sourced ingredients, crafted for the modern lifestyle.</p>
           {/* This uses React Router's Link to go to the product page */}
-          <Link to="/product" className="btn">Explore the Range</Link>
+          <Link to="/collection" className="btn">Explore the Range</Link>
         </div>
 
         <div className="hero-slider-container">
-          {/* FIXED: Line 39 now uses backticks to calculate the slide math! */}
           <div className="slider-track" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-            
-            {/* FIXED: Line 40 now uses backticks to apply the 'active' zoom class! */}
-            <Link to="/product" className={`slide ${currentSlide === 0 ? 'active' : ''}`}>
-              <img src="/moringa nutri bar pic.webp" alt="Premium Ingredients" />
-              <div className="slide-overlay"><span className="slide-text">The Signature 25g Bar</span></div>
-            </Link>
-
-            {/* FIXED: Line 44 now uses backticks to apply the 'active' zoom class! */}
-            <Link to="/product" className={`slide ${currentSlide === 1 ? 'active' : ''}`}>
-              <img src="/Main_logo.webp" alt="Premium Ingredients" style={{ objectFit: 'contain', backgroundColor: '#F4F1EB', padding: '4rem' }}/>
-              <div className="slide-overlay"><span className="slide-text">The Emerald's</span></div>
-            </Link>
-
+            {slides.map((slide, i) => (
+              <div key={i} className={`slide ${currentSlide === i ? 'active' : ''}`}>
+                {slide.imageUrl
+                  ? <img src={slide.imageUrl} alt={slide.label} />
+                  : <div className="slide-placeholder" />
+                }
+                <div className="slide-overlay"><span className="slide-text">{slide.label}</span></div>
+              </div>
+            ))}
           </div>
-          
+
           <div className="slider-progress-bg">
             <div className="slider-progress-fill" style={{ width: `${progress}%` }}></div>
           </div>
+
+          {slides[currentSlide]?.productId && (
+            <Link
+              to={`/product/${slides[currentSlide].productId}`}
+              className="btn hero-order-btn"
+            >
+              Order Now
+            </Link>
+          )}
         </div>
       </section>
 

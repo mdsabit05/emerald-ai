@@ -31,6 +31,7 @@ import {
 } from "../lib/api";
 
 import "./Navbar.css";
+import "./CartDrawer.css";
 
 export default function Navbar() {
 const { user } =

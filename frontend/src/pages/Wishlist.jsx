@@ -144,8 +144,15 @@ Wishlist() {
                       )}
                     </p>
 
+                    <p className="stock-label">
+                      {product.stock <= 0
+                        ? "Out of Stock"
+                        : `${product.stock} left`}
+                    </p>
+
                     <button
                       className="wishlist-cart-btn"
+                      disabled={product.stock <= 0}
                       onClick={() =>
                         addToCart({
                           ...product,

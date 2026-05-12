@@ -133,10 +133,13 @@ productsRoute.post(
   const validatedData = createProductSchema.safeParse(body);
 
   if (!validatedData.success) {
+    const message = validatedData.error.issues
+      .map((i) => `${i.path.join(".")}: ${i.message}`)
+      .join(", ");
     return c.json(
       {
         success: false,
-        errors: validatedData.error.format(),
+        message,
       },
       400
     );
@@ -179,10 +182,13 @@ productsRoute.put(
     const validatedData = createProductSchema.safeParse(body);
 
     if (!validatedData.success) {
+      const message = validatedData.error.issues
+        .map((i) => `${i.path.join(".")}: ${i.message}`)
+        .join(", ");
       return c.json(
         {
           success: false,
-          errors: validatedData.error.format(),
+          message,
         },
         400
       );

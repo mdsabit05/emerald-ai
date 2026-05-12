@@ -420,6 +420,24 @@ removeFromWishlist(
   return data;
 }
 
+export async function getSlides() {
+  const res = await fetch(`${API_URL}/slider`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch slides");
+  return data.data;
+}
+
+export async function updateSlide(token, id, slideData) {
+  const res = await fetch(`${API_URL}/slider/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(slideData),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to update slide");
+  return data.data;
+}
+
 export async function getAddresses(token) {
   const res = await fetch(`${API_URL}/addresses`, {
     headers: { Authorization: `Bearer ${token}` },

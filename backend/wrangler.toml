@@ -7,7 +7,7 @@ ip = "0.0.0.0"
 port = 47832
 
 [vars]
-RAZORPAY_KEY_ID = "rzp_test_YOUR_KEY_ID_HERE"
+RAZORPAY_KEY_ID = "rzp_test_SoN0hCH8K58EO7"
 
 [[d1_databases]]
 binding = "DB"

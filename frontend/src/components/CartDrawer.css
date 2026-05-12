@@ -17,7 +17,7 @@
 .cart-drawer {
   position: fixed;
   top: 0;
-  right: -420px;
+  right: 0;
   width: 420px;
   max-width: 100%;
   height: 100vh;
@@ -25,12 +25,13 @@
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  transition: 0.35s ease;
+  transform: translateX(100%);
+  transition: transform 0.35s ease;
   border-left: 1px solid rgba(0,0,0,0.06);
 }
 
 .cart-drawer.open {
-  right: 0;
+  transform: translateX(0);
 }
 
 .cart-header {

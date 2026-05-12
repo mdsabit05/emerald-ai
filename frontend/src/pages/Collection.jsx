@@ -5,8 +5,7 @@ import { Heart } from "lucide-react";
 
 import { useCart } from "../components/CartContext";
 import { useWishlist } from "../components/WishlistContext";
-import toast
-from "react-hot-toast";
+import toast from "react-hot-toast";
 import { getProducts } from "../lib/api";
 
 import "./collection.css";
@@ -424,19 +423,26 @@ export default function Collection() {
     {/* QUICK ADD */}
     <div className="quick-add-overlay">
 
-      <button
-        className="btn-quick-add"
-        onClick={(e) =>
-          handleQuickAdd(
-            e,
-            normalizedProduct
-          )
-        }
-      >
-
-        + Quick Add
-
-      </button>
+      {product.stock <= 0 ? (
+        <button
+          className="btn-quick-add btn-out-of-stock"
+          disabled
+        >
+          Out of Stock
+        </button>
+      ) : (
+        <button
+          className="btn-quick-add"
+          onClick={(e) =>
+            handleQuickAdd(
+              e,
+              normalizedProduct
+            )
+          }
+        >
+          + Quick Add
+        </button>
+      )}
 
     </div>
 
@@ -473,6 +479,12 @@ export default function Collection() {
       {normalizedProduct.price.toFixed(
         2
       )}
+    </p>
+
+    <p className="stock-label">
+      {product.stock <= 0
+        ? "Out of Stock"
+        : `${product.stock} left`}
     </p>
 
   </div>

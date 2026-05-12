@@ -90,6 +90,14 @@ userImage:
     ),
 });
 
+export const sliderSlides = sqliteTable("slider_slides", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  position: integer("position").notNull(),
+  label: text("label").notNull(),
+  imageUrl: text("image_url").default(""),
+  productId: integer("product_id"),
+});
+
 export const addresses = sqliteTable("addresses", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   clerkUserId: text("clerk_user_id").notNull(),

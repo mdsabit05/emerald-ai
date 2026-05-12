@@ -5,6 +5,7 @@ import ordersRoute from "./routes/orders";
 import reviewsRoute from "./routes/reviews";
 import wishlistRoute from "./routes/wishlist";
 import addressesRoute from "./routes/addresses";
+import sliderRoute from "./routes/slider";
 
 type Bindings = {
   DB: D1Database;
@@ -37,5 +38,6 @@ app.route("/api/orders", ordersRoute);
 app.route("/api/reviews", reviewsRoute);
 app.route("/api/wishlist", wishlistRoute);
 app.route("/api/addresses", addressesRoute);
+app.route("/api/slider", sliderRoute);
 
 export default app;
