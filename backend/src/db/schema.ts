@@ -21,18 +21,14 @@ export const orders = sqliteTable("orders", {
   id: integer("id").primaryKey({
     autoIncrement: true,
   }),
-
-  clerkUserId: text("clerk_user_id")
-    .notNull(),
-
-  totalAmount: integer("total_amount")
-    .notNull(),
-
-  status: text("status")
-    .default("pending"),
-
-  createdAt: text("created_at")
-    .default(sql`CURRENT_TIMESTAMP`),
+  clerkUserId: text("clerk_user_id").notNull(),
+  razorpayOrderId: text("razorpay_order_id"),
+  razorpayPaymentId: text("razorpay_payment_id"),
+  addressSnapshot: text("address_snapshot"),
+  totalAmount: integer("total_amount").notNull(),
+  paymentStatus: text("payment_status").default("pending"),
+  status: text("status").default("pending"),
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const orderItems = sqliteTable(
@@ -92,6 +88,17 @@ userImage:
     }).$defaultFn(
       () => new Date()
     ),
+});
+
+export const addresses = sqliteTable("addresses", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  clerkUserId: text("clerk_user_id").notNull(),
+  name: text("name").notNull(),
+  phone: text("phone").notNull(),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  pincode: text("pincode").notNull(),
 });
 
 export const wishlists =
