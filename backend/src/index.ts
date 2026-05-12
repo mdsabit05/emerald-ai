@@ -4,11 +4,13 @@ import { cors } from "hono/cors";
 import ordersRoute from "./routes/orders";
 import reviewsRoute from "./routes/reviews";
 import wishlistRoute from "./routes/wishlist";
-
+import addressesRoute from "./routes/addresses";
 
 type Bindings = {
   DB: D1Database;
   CLERK_SECRET_KEY: string;
+  RAZORPAY_KEY_ID: string;
+  RAZORPAY_KEY_SECRET: string;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -23,18 +25,17 @@ app.use(
   })
 );
 
-const api = app.basePath("/api");
-
-api.get("/", (c) => {
+app.get("/api", (c) => {
   return c.json({
     success: true,
     message: "API running",
   });
 });
 
-api.route("/products", productsRoute);
-api.route("/orders", ordersRoute);
-api.route("/reviews", reviewsRoute);
-api.route("/wishlist", wishlistRoute);
+app.route("/api/products", productsRoute);
+app.route("/api/orders", ordersRoute);
+app.route("/api/reviews", reviewsRoute);
+app.route("/api/wishlist", wishlistRoute);
+app.route("/api/addresses", addressesRoute);
 
 export default app;
