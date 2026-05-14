@@ -6,8 +6,17 @@ import { authMiddleware } from "../middleware/auth";
 
 const addressesRoute = new Hono();
 
+async function ensureAddressesTable(env: any) {
+  try {
+    await env.DB.prepare(
+      "CREATE TABLE IF NOT EXISTS addresses (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, clerk_user_id TEXT NOT NULL, name TEXT NOT NULL, phone TEXT NOT NULL, address TEXT NOT NULL, city TEXT NOT NULL, state TEXT NOT NULL, pincode TEXT NOT NULL)"
+    ).run();
+  } catch (_) {}
+}
+
 // GET all addresses for current user
 addressesRoute.get("/", authMiddleware, async (c) => {
+  await ensureAddressesTable(c.env);
   const user = c.get("user");
   const db = createDB(c.env.DB);
 
@@ -21,6 +30,7 @@ addressesRoute.get("/", authMiddleware, async (c) => {
 
 // CREATE address
 addressesRoute.post("/", authMiddleware, async (c) => {
+  await ensureAddressesTable(c.env);
   const user = c.get("user");
   const db = createDB(c.env.DB);
   const body = await c.req.json();

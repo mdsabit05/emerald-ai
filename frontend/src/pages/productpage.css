@@ -395,3 +395,20 @@
     letter-spacing: 1.5px;
   }
 }
+@media (max-width: 1024px) {
+  .related-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .related-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .related-image-wrap {
+    height: 240px;
+  }
+}

@@ -9,6 +9,8 @@ export const createProductSchema = z.object({
 
   imageUrl: z.string(),
 
+  images: z.array(z.string()).optional().default([]),
+
   stock: z.number().min(0),
 
   category: z.string(),

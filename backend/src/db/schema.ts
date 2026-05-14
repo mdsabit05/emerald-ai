@@ -12,6 +12,8 @@ export const products = sqliteTable("products", {
 
   imageUrl: text("image_url").notNull(),
 
+  images: text("images").default("[]"),
+
   stock: integer("stock").default(0),
 
   category: text("category").notNull(),

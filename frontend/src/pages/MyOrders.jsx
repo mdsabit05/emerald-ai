@@ -1,562 +1,255 @@
-// import { useState, useEffect } from 'react';
-// import { Link } from 'react-router-dom';
-
-// // --- REAL CLOUD FIREBASE IMPORTS ---
-// import { auth, db, googleProvider } from '../firebase';
-// import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
-// import { doc, getDoc, setDoc } from 'firebase/firestore';
-
-// export default function MyOrders() {
-//   const [authMode, setAuthMode] = useState('login'); 
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
-//   const [activeTab, setActiveTab] = useState('orders'); 
-//   const [isNewUser, setIsNewUser] = useState(false);
-
-//   // User Data State
-//   const [userData, setUserData] = useState({
-//     firstName: '', lastName: '', email: '', phone: '', address: '', city: '', zip: '', profilePic: null
-//   });
-
-//   const [formData, setFormData] = useState({ email: '', password: '' });
-
-//   // --- LIVE CLOUD AUTHENTICATION LISTENER ---
-//  // --- LIVE CLOUD AUTHENTICATION LISTENER (WITH SAFETY NET) ---
-//   // --- TEMPORARY DIAGNOSTIC LISTENER (NO DATABASE) ---
-//   // --- LIVE CLOUD AUTHENTICATION & DATABASE LISTENER ---
-//   useEffect(() => {
-//     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-//       if (user) {
-//         try {
-//           // Point directly to this specific user's document in your Indian database
-//           const userRef = doc(db, "users", user.uid);
-//           const userSnap = await getDoc(userRef);
-
-//           if (userSnap.exists()) {
-//             // User exists! Load their saved profile.
-//             setUserData(userSnap.data());
-//             setIsNewUser(false);
-//           } else {
-//             // First time logging in! Create a new profile in the database.
-//             const newProfile = {
-//               firstName: user.displayName?.split(' ')[0] || 'VIP',
-//               lastName: user.displayName?.split(' ')[1] || '',
-//               email: user.email,
-//               phone: '', address: '', city: '', zip: '',
-//               profilePic: user.photoURL || null
-//             };
-//             await setDoc(userRef, newProfile);
-//             setUserData(newProfile);
-//             setIsNewUser(true);
-//           }
-//         } catch (error) {
-//           console.error("Database connection error:", error);
-//           // If a strict firewall blocks it again, it will at least tell us!
-//         }
-        
-//         setIsAuthenticated(true);
-//       } else {
-//         setIsAuthenticated(false);
-//       }
-//     });
-
-//     return () => unsubscribe();
-//   }, []);
-
-  
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData(prev => ({ ...prev, [name]: value }));
-//   };
-
-//   // --- THE GOOGLE LOGIN TRIGGER ---
-// // --- THE GOOGLE LOGIN TRIGGER (UPDATED TO REDIRECT) ---
-// const handleGoogleSignIn = async () => {
-//     try {
-//       await signInWithPopup(auth, googleProvider);
-//     } catch (error) {
-//       console.error("Popup Error:", error);
-//       alert("Please allow popups for localhost to log in!");
-//     }
-//   };
-
-//   const handleAuthSubmit = (e) => {
-//     e.preventDefault();
-//     alert("Email/Password login is currently routing through Google for enhanced security. Please click 'Continue with Google'.");
-//   };
-
-//   const handleSignOut = () => {
-//     const isConfirmed = window.confirm("Are you sure you want to sign out of your Emerald Green account?");
-//     if (isConfirmed) {
-//       signOut(auth);
-//     }
-//   };
-
-//   // --- VIEW 1: REAL AUTHENTICATION SCREEN ---
-//   if (!isAuthenticated) {
-//     return (
-//       <div className="profile-page-wrapper auth-view">
-//         <div className="auth-container">
-//           <div className="auth-header">
-//             <h2>Emerald VIP</h2>
-//             <p>Access your personal wellness concierge and order tracking.</p>
-//           </div>
-
-//           {/* LUXURY GOOGLE BUTTON */}
-//           <button type="button" onClick={handleGoogleSignIn} style={{
-//             width: '100%', padding: '15px', marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
-//             backgroundColor: '#fff', color: '#000', border: '1px solid rgba(19, 46, 36, 0.2)', borderRadius: '4px', cursor: 'pointer',
-//             fontFamily: 'Montserrat, sans-serif', fontSize: '0.9rem', fontWeight: '600', transition: 'transform 0.3s'
-//           }}>
-//             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{width: '20px'}} />
-//             Continue with Google
-//           </button>
-
-//           <div style={{display: 'flex', alignItems: 'center', gap: '15px', margin: '0 0 2rem 0', opacity: 0.5}}>
-//             <div style={{flex: 1, height: '1px', backgroundColor: 'var(--emerald)'}}></div>
-//             <span style={{fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '2px'}}>Or</span>
-//             <div style={{flex: 1, height: '1px', backgroundColor: 'var(--emerald)'}}></div>
-//           </div>
-
-//           <form className="auth-form" onSubmit={handleAuthSubmit}>
-//             <input type="email" name="email" className="luxury-input" placeholder="Email Address" value={formData.email} onChange={handleInputChange} />
-//             <input type="password" name="password" className="luxury-input" placeholder="Password" value={formData.password} onChange={handleInputChange} />
-            
-//             <button type="submit" className="btn btn-buy-now">
-//               Access Profile
-//             </button>
-//           </form>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // --- VIEW 2: THE VIP DASHBOARD ---
-//   return (
-//     <div className="profile-page-wrapper dashboard-view">
-//       <div className="dashboard-layout">
-        
-//         {/* Sidebar Navigation */}
-//         <aside className="dashboard-sidebar">
-//           <div className="user-profile-summary">
-//             <div className="avatar-container">
-//               {userData.profilePic ? (
-//                 <img src={userData.profilePic} alt="Profile" className="user-avatar" referrerPolicy="no-referrer" />
-//               ) : (
-//                 <div className="avatar-placeholder">{userData.firstName.charAt(0)}</div>
-//               )}
-//             </div>
-//             <div className="user-greeting">
-//               <h3>{isNewUser ? 'Welcome,' : 'Welcome back,'}</h3>
-//               <h2>{userData.firstName}.</h2>
-//               <h3>Tier :</h3>
-//               <span className="vip-badge">Emerald Green Member 💌</span>
-//             </div>
-//           </div>
-
-//           <nav className="dashboard-nav">
-//             <div className="nav-tabs-group">
-//               <button className={`nav-btn ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>Active Orders</button>
-//               <button className={`nav-btn ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>Order History</button>
-//               <button className={`nav-btn ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>Profile & Settings</button>
-//             </div>
-            
-//             <button className="nav-btn logout-btn" onClick={handleSignOut}>
-//               Sign Out
-//             </button>
-//           </nav>
-//         </aside>
-
-//         {/* Main Content Area */}
-//         <main className="dashboard-content">
-          
-//           {activeTab === 'orders' && (
-//             <div className="tracking-hub">
-//               <span className="section-label">Live Tracking</span>
-//               <h2 className="dashboard-title">Active Orders</h2>
-//               <div className="empty-state-card">
-//                 <div className="empty-state-icon">📦</div>
-//                 <h3>No active orders</h3>
-//                 <p>You currently have no orders in transit. Explore our collection to begin your wellness journey.</p>
-//                 <Link to="/collection" className="btn" style={{marginTop: '1.5rem'}}>Shop the Collection</Link>
-//               </div>
-//             </div>
-//           )}
-
-//           {activeTab === 'history' && (
-//             <div className="history-hub">
-//               <span className="section-label">Past Deliveries</span>
-//               <h2 className="dashboard-title">Order History</h2>
-//               <div className="empty-state-card">
-//                 <h3>No order history</h3>
-//                 <p>Once your first order is delivered, your receipts and re-order links will appear here.</p>
-//               </div>
-//             </div>
-//           )}
-
-//           {activeTab === 'profile' && (
-//             <div className="profile-settings-hub">
-//               <span className="section-label">Account Details</span>
-//               <h2 className="dashboard-title">Profile & Settings</h2>
-              
-//               <div className="settings-grid">
-//                 <div className="settings-block photo-upload-block">
-//                   <div className="current-photo">
-//                     {userData.profilePic ? <img src={userData.profilePic} alt="Profile" referrerPolicy="no-referrer" /> : <div className="placeholder">{userData.firstName.charAt(0)}</div>}
-//                   </div>
-//                   <div className="photo-actions">
-//                     <h4>Profile Picture</h4>
-//                     <p>Your avatar is currently synced securely via Google.</p>
-//                   </div>
-//                 </div>
-
-//                 <form className="settings-form" onSubmit={(e) => { e.preventDefault(); alert("Profile Updates via Cloud coming next!"); }}>
-//                   <h4 className="form-section-title">Personal Information</h4>
-//                   <div className="input-row">
-//                     <div className="input-group">
-//                       <label>First Name</label>
-//                       <input type="text" name="firstName" className="luxury-input" value={userData.firstName} readOnly />
-//                     </div>
-//                     <div className="input-group">
-//                       <label>Last Name</label>
-//                       <input type="text" name="lastName" className="luxury-input" value={userData.lastName} readOnly />
-//                     </div>
-//                   </div>
-
-//                   <div className="input-row">
-//                     <div className="input-group">
-//                       <label>Email Address</label>
-//                       <input type="email" name="email" className="luxury-input" value={userData.email} readOnly style={{opacity: 0.6}} />
-//                     </div>
-//                     <div className="input-group">
-//                       <label>Phone Number</label>
-//                       <input type="tel" name="phone" className="luxury-input" placeholder="+91" defaultValue={userData.phone} />
-//                     </div>
-//                   </div>
-
-//                   <button type="submit" className="btn btn-buy-now" style={{marginTop: '2rem'}}>Save Changes to Cloud</button>
-//                 </form>
-//               </div>
-//             </div>
-//           )}
-
-//         </main>
-//       </div>
-//     </div>
-//   );
-// }
-
-
 import { useEffect, useState } from "react";
-
 import { Link } from "react-router-dom";
+import { useAuth, useUser, UserButton, SignInButton } from "@clerk/clerk-react";
+import { ChevronDown, ChevronUp, Package } from "lucide-react";
+import { getMyOrders, getMyOrderDetails } from "../lib/api";
 
-import {
-  useAuth,
-  useUser,
-  UserButton,
-} from "@clerk/clerk-react";
+const STATUS_CONFIG = {
+  pending:   { label: "Pending",   color: "#b97c0a", bg: "#fff8e6" },
+  confirmed: { label: "Confirmed", color: "#1a6fbe", bg: "#e8f1fc" },
+  shipped:   { label: "Shipped",   color: "#7b3fcf", bg: "#f3ecfd" },
+  delivered: { label: "Delivered", color: "#1a7a45", bg: "#e8f5ee" },
+  cancelled: { label: "Cancelled", color: "#c0392b", bg: "#fdecea" },
+};
 
-import { getMyOrders } from "../lib/api";
+function StatusBadge({ status }) {
+  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
+  return (
+    <span style={{
+      padding: "4px 12px",
+      borderRadius: "20px",
+      fontSize: "0.75rem",
+      fontWeight: 700,
+      letterSpacing: "0.04em",
+      textTransform: "uppercase",
+      color: cfg.color,
+      background: cfg.bg,
+    }}>
+      {cfg.label}
+    </span>
+  );
+}
+
+function OrderCard({ order, token }) {
+  const [open, setOpen] = useState(false);
+  const [details, setDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  async function toggleDetails() {
+    if (open) { setOpen(false); return; }
+    setOpen(true);
+    if (details) return;
+    setLoading(true);
+    try {
+      const data = await getMyOrderDetails(token, order.id);
+      setDetails(data);
+    } catch {
+      setDetails(null);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="order-card">
+      {/* ORDER HEADER */}
+      <div className="order-card-header" onClick={toggleDetails}>
+        <div className="order-card-meta">
+          <span className="order-id">Order #{order.id}</span>
+          <span className="order-date">
+            {new Date(order.createdAt).toLocaleDateString("en-IN", {
+              day: "numeric", month: "short", year: "numeric"
+            })}
+          </span>
+        </div>
+        <div className="order-card-right">
+          <span className="order-total">₹{order.totalAmount}</span>
+          <StatusBadge status={order.status} />
+          {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        </div>
+      </div>
+
+      {/* ORDER DETAIL */}
+      {open && (
+        <div className="order-card-detail">
+          {loading ? (
+            <div style={{ display: "flex", justifyContent: "center", padding: "1.5rem" }}><div className="spinner" /></div>
+          ) : details ? (
+            <>
+              {/* ITEMS */}
+              <div className="order-items-list">
+                {details.items.map((item, i) => (
+                  <div key={i} className="order-item-row">
+                    {item.productImage && (
+                      <img src={item.productImage} alt={item.productName} className="order-item-img" />
+                    )}
+                    <div className="order-item-info">
+                      <span className="order-item-name">{item.productName}</span>
+                      <span className="order-item-qty">Qty: {item.quantity}</span>
+                    </div>
+                    <span className="order-item-price">₹{item.price * item.quantity}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="order-detail-divider" />
+
+              {/* TOTAL ROW */}
+              <div className="order-detail-total-row">
+                <span>Total</span>
+                <span>₹{details.totalAmount}</span>
+              </div>
+
+              {/* ADDRESS */}
+              {details.address && (
+                <div className="order-delivery-address">
+                  <span className="order-detail-label">Delivery Address</span>
+                  <p>
+                    {details.address.fullName && <>{details.address.fullName}<br /></>}
+                    {details.address.address && <>{details.address.address}<br /></>}
+                    {details.address.city && <>{details.address.city}{details.address.state ? `, ${details.address.state}` : ""}{details.address.pincode ? ` - ${details.address.pincode}` : ""}<br /></>}
+                    {details.address.phone && <>Phone: {details.address.phone}</>}
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="order-detail-loading">Could not load details.</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function MyOrders() {
-
-  const { getToken } = useAuth();
-
+  const { getToken, isSignedIn } = useAuth();
   const { user } = useUser();
 
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [token, setToken] = useState(null);
+  const [activeTab, setActiveTab] = useState("orders");
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const [error, setError] =
-    useState("");
-
-  const [activeTab, setActiveTab] =
-    useState("orders");
-
-  // FETCH ORDERS
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const token = await getToken({
-          template: "default",
-        });
-
-        const data = await getMyOrders(
-          token
-        );
-
+        const t = await getToken({ template: "default" });
+        setToken(t);
+        const data = await getMyOrders(t);
         setOrders(data);
-
       } catch (err) {
         setError(err.message);
-
       } finally {
         setLoading(false);
       }
     }
-
     fetchOrders();
   }, []);
 
-  // LOADING
-  if (loading) {
+  if (!isSignedIn && !loading) {
     return (
-      <div
-        style={{
-          padding: "4rem",
-          textAlign: "center",
-        }}
-      >
-        <h2>Loading orders...</h2>
+      <div className="profile-page-wrapper dashboard-view">
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: "1.5rem", textAlign: "center" }}>
+          <Package size={48} strokeWidth={1.2} style={{ color: "var(--text-light)", opacity: 0.4 }} />
+          <h2 style={{ fontSize: "1.6rem", color: "var(--emerald)", fontFamily: "'Playfair Display', serif" }}>Please sign in</h2>
+          <p style={{ color: "var(--text-light)", maxWidth: 360 }}>
+            Please login to see your orders.
+          </p>
+          <SignInButton mode="modal">
+            <button className="signin-btn" style={{ fontSize: "0.9rem", padding: "12px 32px" }}>Sign In</button>
+          </SignInButton>
+        </div>
       </div>
     );
   }
 
-  // ERROR
+  if (loading) {
+    return <div className="page-spinner"><div className="spinner" /></div>;
+  }
+
   if (error) {
-    return (
-      <div
-        style={{
-          padding: "4rem",
-          textAlign: "center",
-        }}
-      >
-        <h2>{error}</h2>
-      </div>
-    );
+    return <div style={{ padding: "4rem", textAlign: "center" }}><p>{error}</p></div>;
   }
 
   return (
     <div className="profile-page-wrapper dashboard-view">
-
       <div className="dashboard-layout">
 
         {/* SIDEBAR */}
         <aside className="dashboard-sidebar">
-
           <div className="user-profile-summary">
-
-            <div
-              style={{
-                marginBottom: "1rem",
-              }}
-            >
+            <div style={{ marginBottom: "1rem" }}>
               <UserButton />
             </div>
-
             <div className="user-greeting">
-
               <h3>Welcome back,</h3>
-
-              <h2>
-                {user?.firstName || "VIP"}.
-              </h2>
-
-              <span className="vip-badge">
-                Emerald Green Member 💌
-              </span>
-
+              <h2>{user?.firstName || "VIP"}.</h2>
+              <span className="vip-badge">Emerald Green Member 💌</span>
             </div>
-
           </div>
 
           <nav className="dashboard-nav">
-
             <div className="nav-tabs-group">
-
               <button
-                className={`nav-btn ${
-                  activeTab === "orders"
-                    ? "active"
-                    : ""
-                }`}
-                onClick={() =>
-                  setActiveTab("orders")
-                }
+                className={`nav-btn ${activeTab === "orders" ? "active" : ""}`}
+                onClick={() => setActiveTab("orders")}
               >
                 My Orders
               </button>
-
               <button
-                className={`nav-btn ${
-                  activeTab === "profile"
-                    ? "active"
-                    : ""
-                }`}
-                onClick={() =>
-                  setActiveTab("profile")
-                }
+                className={`nav-btn ${activeTab === "profile" ? "active" : ""}`}
+                onClick={() => setActiveTab("profile")}
               >
                 Profile
               </button>
-
             </div>
-
           </nav>
-
         </aside>
 
         {/* MAIN */}
         <main className="dashboard-content">
 
-          {/* ORDERS */}
           {activeTab === "orders" && (
-
             <div className="tracking-hub">
-
-              <span className="section-label">
-                Your Purchases
-              </span>
-
-              <h2 className="dashboard-title">
-                My Orders
-              </h2>
+              <span className="section-label">Your Purchases</span>
+              <h2 className="dashboard-title">My Orders</h2>
 
               {orders.length === 0 ? (
-
                 <div className="empty-state-card">
-
-                  <div className="empty-state-icon">
-                    📦
-                  </div>
-
+                  <div className="empty-state-icon"><Package size={40} strokeWidth={1.5} /></div>
                   <h3>No orders yet</h3>
-
-                  <p>
-                    Explore our premium
-                    collection to begin your
-                    wellness journey.
-                  </p>
-
-                  <Link
-                    to="/collection"
-                    className="btn"
-                    style={{
-                      marginTop: "1.5rem",
-                    }}
-                  >
+                  <p>Explore our premium collection to begin your wellness journey.</p>
+                  <Link to="/collection" className="btn" style={{ marginTop: "1.5rem" }}>
                     Shop Collection
                   </Link>
-
                 </div>
-
               ) : (
-
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "1.5rem",
-                    marginTop: "2rem",
-                  }}
-                >
-
+                <div className="orders-list">
                   {orders.map((order) => (
-
-                    <div
-                      key={order.id}
-                      style={{
-                        border:
-                          "1px solid #ddd",
-                        padding: "1.5rem",
-                        borderRadius: "8px",
-                        background: "#fff",
-                      }}
-                    >
-
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent:
-                            "space-between",
-                          marginBottom:
-                            "1rem",
-                        }}
-                      >
-
-                        <h3>
-                          Order #{order.id}
-                        </h3>
-
-                        <span
-                          style={{
-                            fontWeight:
-                              "bold",
-                          }}
-                        >
-                          {order.status}
-                        </span>
-
-                      </div>
-
-                      <p>
-                        Total: ₹
-                        {order.totalAmount}
-                      </p>
-
-                      <p>
-                        Date:{" "}
-                        {new Date(
-                          order.createdAt
-                        ).toLocaleString()}
-                      </p>
-
-                    </div>
-
+                    <OrderCard key={order.id} order={order} token={token} />
                   ))}
-
                 </div>
-
               )}
-
             </div>
-
           )}
 
-          {/* PROFILE */}
           {activeTab === "profile" && (
-
             <div className="profile-settings-hub">
-
-              <span className="section-label">
-                Account
-              </span>
-
-              <h2 className="dashboard-title">
-                Profile
-              </h2>
-
-              <div
-                style={{
-                  marginTop: "2rem",
-                }}
-              >
-
-                <p>
-                  <strong>Name:</strong>{" "}
-                  {user?.fullName}
+              <span className="section-label">Account</span>
+              <h2 className="dashboard-title">Profile</h2>
+              <div style={{ marginTop: "2rem" }}>
+                <p><strong>Name:</strong> {user?.fullName}</p>
+                <p style={{ marginTop: "0.75rem" }}>
+                  <strong>Email:</strong> {user?.primaryEmailAddress?.emailAddress}
                 </p>
-
-                <p>
-                  <strong>Email:</strong>{" "}
-                  {
-                    user?.primaryEmailAddress
-                      ?.emailAddress
-                  }
-                </p>
-
               </div>
-
             </div>
-
           )}
 
         </main>
-
       </div>
-
     </div>
   );
 }

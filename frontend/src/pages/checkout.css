@@ -5,7 +5,7 @@
 .checkout-page-wrapper {
   background: #f8f7f2;
   min-height: 100vh;
-  padding-top: 80px;
+  padding-top: 95px;
   padding-bottom: 50px;
 }
 
@@ -616,6 +616,33 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* =========================================
+   ADDITIONAL RESPONSIVE
+========================================= */
+
+@media (max-width: 480px) {
+  .checkout-page-wrapper {
+    padding-top: 85px;
+  }
+
+  .checkout-header-simple {
+    padding: 0 16px 16px;
+  }
+
+  .checkout-header-simple h2 {
+    font-size: 1.6rem;
+  }
+
+  .order-success-wrapper {
+    margin: 20px 16px;
+    padding: 28px 20px;
+  }
+
+  .order-success-heading {
+    font-size: 1.4rem;
+  }
 }
 
 .order-success-item {

@@ -10,11 +10,22 @@ import { createProductSchema } from "../validators/product";
 import { authMiddleware } from "../middleware/auth";
 const productsRoute = new Hono();
 
+// Auto-add images column if missing (production migration)
+async function ensureImagesColumn(env: any) {
+  try {
+    await env.DB.prepare("ALTER TABLE products ADD COLUMN images TEXT DEFAULT '[]'").run();
+  } catch (_) {}
+}
+
+function parseImages(raw: string | null | undefined): string[] {
+  try { return JSON.parse(raw || "[]"); } catch { return []; }
+}
 
 // GET ALL PRODUCTS
 productsRoute.get(
   "/",
   async (c) => {
+    await ensureImagesColumn(c.env);
 
     const db =
       createDB(c.env.DB);
@@ -37,6 +48,9 @@ productsRoute.get(
 
           imageUrl:
             products.imageUrl,
+
+          images:
+            products.images,
 
           stock:
             products.stock,
@@ -76,9 +90,11 @@ productsRoute.get(
           products.id
         );
 
+    const parsed = allProducts.map((p) => ({ ...p, images: parseImages(p.images) }));
+
     return c.json({
       success: true,
-      data: allProducts,
+      data: parsed,
     });
   }
 );
@@ -89,35 +105,21 @@ productsRoute.get("/:id", async (c) => {
   const id = Number(c.req.param("id"));
 
   if (isNaN(id)) {
-    return c.json(
-      {
-        success: false,
-        message: "Invalid product ID",
-      },
-      400
-    );
+    return c.json({ success: false, message: "Invalid product ID" }, 400);
   }
 
+  await ensureImagesColumn(c.env);
   const db = createDB(c.env.DB);
 
-  const product = await db
-    .select()
-    .from(products)
-    .where(eq(products.id, id));
+  const product = await db.select().from(products).where(eq(products.id, id));
 
   if (!product[0]) {
-    return c.json(
-      {
-        success: false,
-        message: "Product not found",
-      },
-      404
-    );
+    return c.json({ success: false, message: "Product not found" }, 404);
   }
 
   return c.json({
     success: true,
-    data: product[0],
+    data: { ...product[0], images: parseImages(product[0].images) },
   });
 });
 
@@ -145,17 +147,13 @@ productsRoute.post(
     );
   }
 
+  await ensureImagesColumn(c.env);
   const db = createDB(c.env.DB);
 
-  await db.insert(products).values(validatedData.data);
+  const { images, ...rest } = validatedData.data;
+  await db.insert(products).values({ ...rest, images: JSON.stringify(images ?? []) });
 
-  return c.json(
-    {
-      success: true,
-      message: "Product created successfully",
-    },
-    201
-  );
+  return c.json({ success: true, message: "Product created successfully" }, 201);
 });
 
 
@@ -211,15 +209,13 @@ productsRoute.put(
       );
     }
 
+    const { images, ...rest } = validatedData.data;
     await db
       .update(products)
-      .set(validatedData.data)
+      .set({ ...rest, images: JSON.stringify(images ?? []) })
       .where(eq(products.id, id));
 
-    return c.json({
-      success: true,
-      message: "Product updated successfully",
-    });
+    return c.json({ success: true, message: "Product updated successfully" });
   }
 );
 

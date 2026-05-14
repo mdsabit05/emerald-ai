@@ -73,6 +73,8 @@ export function CartProvider({
               product.id
           );
 
+        const addQty = product.quantity || 1;
+
         if (existing) {
 
           return prev.map(
@@ -84,7 +86,7 @@ export function CartProvider({
                 ? {
                     ...item,
                     quantity:
-                      item.quantity + 1,
+                      item.quantity + addQty,
                   }
 
                 : item
@@ -96,7 +98,7 @@ export function CartProvider({
 
           {
             ...product,
-            quantity: 1,
+            quantity: addQty,
           },
         ];
       });

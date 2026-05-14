@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getSlides } from '../lib/api';
 
-const defaultSlides = [
-  { id: 1, label: "The Signature 25g Bar", imageUrl: "", productId: null },
-  { id: 2, label: "The Emerald's", imageUrl: "", productId: null },
-];
-
 export default function Home() {
-  const [slides, setSlides] = useState(defaultSlides);
+  const navigate = useNavigate();
+  const [slides, setSlides] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [progress, setProgress] = useState(0);
   const totalSlides = slides.length;
@@ -18,6 +15,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (totalSlides === 0) return;
     const slideDuration = 5000;
     const intervalTime = 50;
     const step = 100 / (slideDuration / intervalTime);
@@ -26,14 +24,14 @@ export default function Home() {
       setProgress((prevProgress) => {
         if (prevProgress >= 100) {
           setCurrentSlide((prevSlide) => (prevSlide + 1) % totalSlides);
-          return 0; 
+          return 0;
         }
         return prevProgress + step;
       });
     }, intervalTime);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [totalSlides]);
 
   return (
     <>
@@ -43,7 +41,7 @@ export default function Home() {
           <h1>Pure organic,<br /><i>elevated.</i></h1>
           <p>We believe true luxury lies in the details. Uncompromising quality and meticulously sourced ingredients, crafted for the modern lifestyle.</p>
           {/* This uses React Router's Link to go to the product page */}
-          <Link to="/collection" className="btn">Explore the Range</Link>
+<Link to="/collection" className="btn">Explore the Range</Link>
         </div>
 
         <div className="hero-slider-container">

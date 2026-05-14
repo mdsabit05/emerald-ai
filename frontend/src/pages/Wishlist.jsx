@@ -160,7 +160,7 @@ Wishlist() {
                             product.name,
                           img:
                             product.imageUrl,
-                        })
+                        }, false)
                       }
                     >
 

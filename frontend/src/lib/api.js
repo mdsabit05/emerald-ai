@@ -1,4 +1,4 @@
-const API_URL = "/api";
+const API_URL = import.meta.env.VITE_API_URL || "/api";
 
 export async function initiateOrder(token, { items, address }) {
   const res = await fetch(`${API_URL}/orders/initiate`, {
@@ -108,6 +108,15 @@ export async function getMyOrders(token) {
   return data.data;
 }
 
+export async function getMyOrderDetails(token, orderId) {
+  const res = await fetch(`${API_URL}/orders/my-orders/${orderId}/details`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch order details");
+  return data.data;
+}
+
 export async function getAllOrders(
   token
 ) {
@@ -132,6 +141,15 @@ export async function getAllOrders(
   return data.data;
 }
 
+
+export async function getOrderDetails(token, orderId) {
+  const res = await fetch(`${API_URL}/orders/admin/${orderId}/details`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch order details");
+  return data.data;
+}
 
 export async function updateOrderStatus(
   token,
@@ -327,6 +345,27 @@ export async function createReview(
   return data;
 }
 
+export async function updateReview(token, reviewId, reviewData) {
+  const res = await fetch(`${API_URL}/reviews/${reviewId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(reviewData),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to update review");
+  return data;
+}
+
+export async function deleteReview(token, reviewId) {
+  const res = await fetch(`${API_URL}/reviews/${reviewId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to delete review");
+  return data;
+}
+
 export async function
 getWishlist(token) {
 
@@ -435,6 +474,36 @@ export async function updateSlide(token, id, slideData) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed to update slide");
+  return data.data;
+}
+
+export async function createSlide(token, slideData) {
+  const res = await fetch(`${API_URL}/slider`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(slideData),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to create slide");
+  return data.data;
+}
+
+export async function deleteSlide(token, id) {
+  const res = await fetch(`${API_URL}/slider/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to delete slide");
+  return data;
+}
+
+export async function getAnalytics(token) {
+  const res = await fetch(`${API_URL}/orders/admin/analytics`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch analytics");
   return data.data;
 }
 

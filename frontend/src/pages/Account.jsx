@@ -4,7 +4,7 @@ import {
 
 import {
   useUser,
-  UserButton,
+  useClerk,
 } from "@clerk/clerk-react";
 import { Link }
 from "react-router-dom";
@@ -22,8 +22,8 @@ import "./account.css";
 
 export default function Account() {
    
-  const { user } =
-    useUser();
+  const { user } = useUser();
+  const { signOut } = useClerk();
   
     
 
@@ -97,7 +97,13 @@ function handleEditSave(e) {
 
           </div>
 
-          <UserButton />
+          <button
+            onClick={() => signOut({ redirectUrl: "/" })}
+            className="signin-btn"
+            style={{ borderRadius: "8px" }}
+          >
+            Sign Out
+          </button>
 
         </div>
 

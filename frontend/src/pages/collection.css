@@ -253,13 +253,26 @@
 }
 /* Collection Mobile Rules (Add inside your existing @media queries!) */
 @media (max-width: 1024px) {
+    .collection-page { padding: 8rem 4% 4rem; }
     .collection-grid { grid-template-columns: repeat(2, 1fr); gap: 3rem 2rem; }
+    .collection-header h1 { font-size: 2.8rem; }
 }
+
 @media (max-width: 768px) {
-    .collection-header { margin-bottom: 3rem; }
-    .collection-header h1 { font-size: 2.5rem; }
-    .collection-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-    .catalog-img-wrapper { aspect-ratio: 1; }
+    .collection-page { padding: 100px 4% 3rem; }
+    .collection-header { margin-bottom: 2rem; }
+    .collection-header h1 { font-size: 2rem; }
+    .collection-header p { font-size: 0.9rem; }
+    .collection-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 1rem; }
+    .catalog-img-wrapper { aspect-ratio: 4/5; }
+    .catalog-info h3 { font-size: 0.9rem; }
+    .catalog-info p { font-size: 0.9rem; }
+}
+
+@media (max-width: 480px) {
+    .collection-page { padding: 90px 4% 2rem; }
+    .collection-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .collection-header h1 { font-size: 1.8rem; }
 }
 
 /* Mobile Collection Filters & Quick Add */

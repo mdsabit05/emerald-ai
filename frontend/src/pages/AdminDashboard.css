@@ -1,7 +1,95 @@
 .admin-page {
-  padding: 40px;
+  padding: 100px 40px 40px;
   background: #f7f7f5;
   min-height: 100vh;
+}
+
+/* ── PAYMENT BADGE ─────────────────────────────────────────────────────────── */
+.payment-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.payment-badge.paid {
+  background: #d1fae5;
+  color: #065f46;
+}
+.payment-badge.unpaid {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* ── ORDER DETAIL PANEL ───────────────────────────────────────────────────── */
+.order-detail-row td {
+  background: #f0ede6;
+  padding: 0 !important;
+}
+.order-detail-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px 24px;
+}
+.order-detail-block {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.order-detail-block h4 {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  margin: 0 0 8px;
+}
+.order-detail-block p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #333;
+}
+.order-detail-block code {
+  font-size: 0.75rem;
+  background: #f3f3f3;
+  padding: 2px 6px;
+  border-radius: 4px;
+  word-break: break-all;
+}
+.order-detail-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.order-detail-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.order-detail-item img {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #eee;
+}
+.order-detail-item p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+.detail-loading {
+  padding: 20px;
+  color: #888;
+  font-size: 0.9rem;
+}
+.no-data {
+  color: #aaa !important;
+  font-style: italic;
 }
 
 .admin-title {
@@ -374,4 +462,282 @@
   border-radius: 8px;
   font-size: 0.9rem;
   outline: none;
+}
+
+/* ── ADD SLIDE FORM ────────────────────────────────────────────────────────── */
+.add-slide-form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+  background: white;
+  padding: 16px 20px;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+/* ── ANALYTICS ─────────────────────────────────────────────────────────────── */
+.analytics-section {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.analytics-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #17332d;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.analytics-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+/* ── THIS MONTH vs LAST MONTH ── */
+.analytics-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.analytics-compare-card {
+  background: white;
+  border-radius: 18px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.analytics-compare-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  font-weight: 600;
+}
+
+.analytics-compare-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #17332d;
+  line-height: 1.1;
+}
+
+.analytics-compare-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.analytics-compare-badge.up {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.analytics-compare-badge.down {
+  background: #fdecea;
+  color: #c0392b;
+}
+
+.analytics-compare-sub {
+  font-size: 0.82rem;
+  color: #aaa;
+}
+
+/* ── CHART ── */
+.analytics-chart-card {
+  padding: 28px 32px 20px;
+}
+
+/* ── TWO COLUMN ── */
+.analytics-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* ── LOW STOCK ── */
+.low-stock-badge {
+  background: #fdecea;
+  color: #c0392b;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stock-level {
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.stock-level.out {
+  background: #fdecea;
+  color: #c0392b;
+}
+
+.stock-level.low {
+  background: #fff8e6;
+  color: #b97c0a;
+}
+
+.analytics-empty {
+  color: #aaa;
+  font-size: 0.9rem;
+  padding: 12px 0;
+}
+
+/* ── STATUS BREAKDOWN ── */
+.analytics-status-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.analytics-status-card {
+  background: #f7f7f5;
+  border: 1px solid #e8e4dc;
+  border-radius: 10px;
+  padding: 14px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 120px;
+}
+
+.analytics-status-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  font-weight: 600;
+}
+
+.analytics-status-count {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #17332d;
+}
+
+@media (max-width: 1024px) {
+  .admin-page {
+    padding: 100px 24px 40px;
+  }
+
+  .order-detail-panel {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .analytics-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .analytics-compare-grid,
+  .analytics-two-col { grid-template-columns: 1fr; }
+
+  .admin-page {
+    padding: 90px 16px 32px;
+  }
+
+  .admin-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .admin-tabs {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .admin-tabs button {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .order-detail-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .admin-stat-card {
+    padding: 20px;
+    border-radius: 14px;
+  }
+
+  .admin-stat-card h3 {
+    font-size: 14px;
+  }
+
+  .admin-stat-card p {
+    font-size: 26px;
+  }
+
+  .admin-table-wrapper {
+    padding: 20px;
+  }
+
+  .analytics-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .analytics-compare-card {
+    padding: 18px 20px;
+  }
+
+  .analytics-compare-value {
+    font-size: 1.6rem;
+  }
+
+  .slider-admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .add-slide-form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-tabs {
+    gap: 6px;
+  }
+
+  .admin-tabs button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
 }

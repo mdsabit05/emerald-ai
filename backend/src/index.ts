@@ -19,7 +19,11 @@ const app = new Hono<{ Bindings: Bindings }>();
 app.use(
   "*",
   cors({
-    origin: "http://localhost:34521",
+    origin: [
+      "http://localhost:34521",
+      "https://emerald-fr-tn.groo.bot",
+      "https://emerald-green-labs.pages.dev",
+    ],
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,

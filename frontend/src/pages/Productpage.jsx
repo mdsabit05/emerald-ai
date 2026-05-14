@@ -14,6 +14,8 @@ import {
 import {
   getReviews,
   createReview,
+  updateReview,
+  deleteReview,
   getSingleProduct,
   getRelatedProducts,
 } from "../lib/api";
@@ -101,6 +103,10 @@ export default function ProductPage() {
     setReviewLoading] =
     useState(false);
 
+  const [editingReviewId, setEditingReviewId] = useState(null);
+  const [editRating, setEditRating] = useState(5);
+  const [editComment, setEditComment] = useState("");
+
      // related product
   const [
   relatedProducts,
@@ -168,11 +174,7 @@ export default function ProductPage() {
 
   // LOADING
   if (loading) {
-    return (
-      <h2>
-        Loading product...
-      </h2>
-    );
+    return <div className="page-spinner"><div className="spinner" /></div>;
   }
 
  
@@ -199,7 +201,8 @@ export default function ProductPage() {
 
   const galleryImages = [
     normalizedProduct.img,
-  ];
+    ...(Array.isArray(normalizedProduct.images) ? normalizedProduct.images : []),
+  ].filter(Boolean);
 
   // AVG RATING
   const averageRating =
@@ -231,7 +234,7 @@ export default function ProductPage() {
       );
 
       const token =
-        await getToken();
+        await getToken({ template: "default" });
 
       await createReview(
         token,
@@ -266,6 +269,30 @@ export default function ProductPage() {
       setReviewLoading(
         false
       );
+    }
+  }
+
+  // EDIT REVIEW
+  async function handleEditSave(reviewId) {
+    try {
+      const token = await getToken({ template: "default" });
+      await updateReview(token, reviewId, { rating: editRating, comment: editComment });
+      const updated = await getReviews(product.id);
+      setReviews(updated);
+      setEditingReviewId(null);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  // DELETE REVIEW
+  async function handleDeleteReview(reviewId) {
+    try {
+      const token = await getToken({ template: "default" });
+      await deleteReview(token, reviewId);
+      setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -338,7 +365,7 @@ export default function ProductPage() {
       addToCart({
         ...normalizedProduct,
         quantity,
-      });
+      }, false);
     };
 
   return (
@@ -749,21 +776,48 @@ export default function ProductPage() {
 
   </div>
 
-  <div className="review-date">
-
-    {new Date(
-      review.createdAt
-    ).toLocaleDateString()}
-
+  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+    <div className="review-date">
+      {new Date(review.createdAt).toLocaleDateString()}
+    </div>
+    {user?.id === review.clerkUserId && editingReviewId !== review.id && (
+      <>
+        <button
+          className="review-action-btn"
+          onClick={() => {
+            setEditingReviewId(review.id);
+            setEditRating(review.rating);
+            setEditComment(review.comment);
+          }}
+        >Edit</button>
+        <button
+          className="review-action-btn review-delete-btn"
+          onClick={() => handleDeleteReview(review.id)}
+        >Delete</button>
+      </>
+    )}
   </div>
 
 </div>
 
-          <p className="review-comment">
-
-            {review.comment}
-
-          </p>
+          {editingReviewId === review.id ? (
+            <div className="review-edit-form">
+              <select value={editRating} onChange={(e) => setEditRating(Number(e.target.value))}>
+                <option value={5}>⭐⭐⭐⭐⭐</option>
+                <option value={4}>⭐⭐⭐⭐</option>
+                <option value={3}>⭐⭐⭐</option>
+                <option value={2}>⭐⭐</option>
+                <option value={1}>⭐</option>
+              </select>
+              <textarea value={editComment} onChange={(e) => setEditComment(e.target.value)} />
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button className="review-submit-btn" onClick={() => handleEditSave(review.id)}>Save</button>
+                <button className="review-action-btn" onClick={() => setEditingReviewId(null)}>Cancel</button>
+              </div>
+            </div>
+          ) : (
+            <p className="review-comment">{review.comment}</p>
+          )}
 
         </div>
       ))}

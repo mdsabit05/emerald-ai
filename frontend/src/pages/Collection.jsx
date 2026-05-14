@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { Heart } from "lucide-react";
 
@@ -14,6 +14,9 @@ export default function Collection() {
 
   const navigate =
     useNavigate();
+
+  const [searchParams] =
+    useSearchParams();
 
   const { addToCart } =
     useCart();
@@ -41,7 +44,9 @@ export default function Collection() {
 
   const [search,
     setSearch] =
-    useState("");
+    useState(
+      searchParams.get("q") || ""
+    );
 
   const [sortBy,
     setSortBy] =
@@ -225,9 +230,6 @@ export default function Collection() {
         normalizedProduct,
         false
       );
-      toast.success(
-  "Added to cart"
-);
     };
 
   return (

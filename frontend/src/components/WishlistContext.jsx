@@ -55,7 +55,7 @@ export function WishlistProvider({
         setLoading(true);
 
         const token =
-          await getToken();
+          await getToken({ template: "default" });
 
         const data =
           await getWishlist(
@@ -115,7 +115,7 @@ export function WishlistProvider({
     try {
 
       const token =
-        await getToken();
+        await getToken({ template: "default" });
 
       // REMOVE
       if (
@@ -141,23 +141,24 @@ export function WishlistProvider({
 
       } else {
 
-        // ADD
-        await addToWishlist(
-          token,
-          productId
-        );
+        // ADD — optimistic update first so heart turns red instantly
+        setWishlist((prev) => [
+          ...prev,
+          { wishlistId: -1, product: { id: productId } },
+        ]);
 
-        // REFRESH
-        const updated =
-          await getWishlist(
-            token
+        try {
+          await addToWishlist(token, productId);
+          // Refresh in background to get real data
+          const updated = await getWishlist(token);
+          setWishlist(Array.isArray(updated) ? updated : []);
+        } catch (err) {
+          // Revert on failure
+          setWishlist((prev) =>
+            prev.filter((item) => item?.product?.id !== productId)
           );
-
-        setWishlist(
-          Array.isArray(updated)
-            ? updated
-            : []
-        );
+          throw err;
+        }
       }
 
     } catch (err) {

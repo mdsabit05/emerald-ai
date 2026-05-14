@@ -11,15 +11,26 @@ import {
 
 import { authMiddleware } from "../middleware/auth";
 
-const wishlistRoute =
-  new Hono();
+const wishlistRoute = new Hono();
 
+async function ensureWishlistTable(env: any) {
+  try {
+    await env.DB.prepare(
+      "CREATE TABLE IF NOT EXISTS wishlists (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, clerk_user_id TEXT NOT NULL, product_id INTEGER NOT NULL, created_at INTEGER)"
+    ).run();
+  } catch (_) {}
+}
+
+function parseImages(raw: string | null | undefined): string[] {
+  try { return JSON.parse(raw || "[]"); } catch { return []; }
+}
 
 // GET USER WISHLIST
 wishlistRoute.get(
   "/",
   authMiddleware,
   async (c) => {
+    await ensureWishlistTable(c.env);
 
     const user =
       c.get("user");
@@ -54,10 +65,12 @@ wishlistRoute.get(
           )
         );
 
-    return c.json({
-      success: true,
-      data: wishlistItems,
-    });
+    const data = wishlistItems.map((item) => ({
+      ...item,
+      product: { ...item.product, images: parseImages((item.product as any).images) },
+    }));
+
+    return c.json({ success: true, data });
   }
 );
 
@@ -67,6 +80,7 @@ wishlistRoute.post(
   "/:productId",
   authMiddleware,
   async (c) => {
+    await ensureWishlistTable(c.env);
 
     const user =
       c.get("user");
@@ -147,6 +161,7 @@ wishlistRoute.delete(
   "/:productId",
   authMiddleware,
   async (c) => {
+    await ensureWishlistTable(c.env);
 
     const user =
       c.get("user");

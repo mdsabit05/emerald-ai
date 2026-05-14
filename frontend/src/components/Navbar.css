@@ -1,3 +1,39 @@
+/* ── SIGN IN BUTTON ── */
+.signin-btn {
+  padding: 8px 20px;
+  border: 1.5px solid var(--emerald);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--emerald);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.signin-btn:hover {
+  background: var(--emerald);
+  color: #fff;
+}
+
+/* ── PROFILE AVATAR ── */
+.navbar-profile {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid rgba(19, 46, 36, 0.2);
+  display: block;
+  transition: border-color 0.2s;
+}
+
+.navbar-profile:hover {
+  border-color: var(--emerald);
+}
+
 .wishlist-nav-btn {
   position: relative;
 
@@ -364,6 +400,14 @@
   margin: 0;
 }
 
+/* ── ACTIVE NAV LINK ── */
+.nav-link-active {
+  color: var(--emerald) !important;
+  font-weight: 700 !important;
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 2px;
+}
+
 .nav-admin-link {
   color: #132e24 !important;
   font-weight: 700 !important;
@@ -410,4 +454,75 @@
   object-fit: cover;
 
   cursor: pointer;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+  .premium-toast {
+    top: 70px;
+    right: 12px;
+    left: 12px;
+    min-width: unset;
+  }
+
+  .toast-img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .search-modal {
+    padding-top: 80px;
+  }
+
+  .search-box {
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+
+  .search-results {
+    border-radius: 16px;
+  }
+
+  .search-result-card img {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+  }
+
+  .wishlist-count {
+    top: -6px;
+    right: -8px;
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+    padding: 0 4px;
+  }
+
+  .nav-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .signin-btn {
+    padding: 6px 12px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .premium-toast {
+    right: 8px;
+    left: 8px;
+  }
+
+  .search-box {
+    width: 95%;
+  }
+
+  .search-results {
+    width: 95%;
+  }
 }

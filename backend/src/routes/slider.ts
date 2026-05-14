@@ -7,8 +7,18 @@ import { adminMiddleware } from "../middleware/admin";
 
 const sliderRoute = new Hono();
 
+// Auto-create table if it doesn't exist (handles missing migrations in production)
+async function ensureTable(env: any) {
+  try {
+    await env.DB.prepare(
+      "CREATE TABLE IF NOT EXISTS slider_slides (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, position INTEGER NOT NULL, label TEXT NOT NULL, image_url TEXT DEFAULT '', product_id INTEGER)"
+    ).run();
+  } catch (_) {}
+}
+
 // GET all slides (public) — includes product image and name when linked
 sliderRoute.get("/", async (c) => {
+  await ensureTable(c.env);
   const db = createDB(c.env.DB);
   const rows = await db
     .select({
@@ -50,6 +60,37 @@ sliderRoute.put("/:id", authMiddleware, adminMiddleware, async (c) => {
     .returning();
 
   return c.json({ success: true, data: result[0] });
+});
+
+// POST create a slide (admin only)
+sliderRoute.post("/", authMiddleware, adminMiddleware, async (c) => {
+  await ensureTable(c.env);
+  const body = await c.req.json();
+  const db = createDB(c.env.DB);
+
+  const existing = await db.select({ position: sliderSlides.position }).from(sliderSlides).orderBy(asc(sliderSlides.position));
+  const nextPosition = existing.length > 0 ? existing[existing.length - 1].position + 1 : 1;
+
+  const result = await db
+    .insert(sliderSlides)
+    .values({
+      position: nextPosition,
+      label: body.label || "New Slide",
+      imageUrl: body.imageUrl || "",
+      productId: body.productId ?? null,
+    })
+    .returning();
+
+  return c.json({ success: true, data: result[0] });
+});
+
+// DELETE a slide (admin only)
+sliderRoute.delete("/:id", authMiddleware, adminMiddleware, async (c) => {
+  const id = Number(c.req.param("id"));
+  const db = createDB(c.env.DB);
+
+  await db.delete(sliderSlides).where(eq(sliderSlides.id, id));
+  return c.json({ success: true });
 });
 
 export default sliderRoute;

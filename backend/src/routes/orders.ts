@@ -3,7 +3,7 @@ import { adminMiddleware } from "../middleware/admin";
 import { authMiddleware } from "../middleware/auth";
 import { desc, eq, sql } from "drizzle-orm";
 import { createDB } from "../db";
-import { orders, orderItems, products } from "../db/schema";
+import { orders, orderItems, products, wishlists } from "../db/schema";
 
 type Bindings = {
   DB: D1Database;
@@ -215,6 +215,171 @@ ordersRoute.get("/my-orders", authMiddleware, async (c) => {
   return c.json({ success: true, data: userOrders });
 });
 
+// ─── GET /my-orders/:id/details ──────────────────────────────────────────────
+ordersRoute.get("/my-orders/:id/details", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const id = Number(c.req.param("id"));
+  const db = createDB(c.env.DB);
+
+  const order = await db.select().from(orders).where(eq(orders.id, id));
+  if (!order[0]) return c.json({ success: false, message: "Order not found" }, 404);
+  if (order[0].clerkUserId !== user.sub) return c.json({ success: false, message: "Forbidden" }, 403);
+
+  const items = await db
+    .select({
+      productId: orderItems.productId,
+      quantity: orderItems.quantity,
+      price: orderItems.price,
+      productName: products.name,
+      productImage: products.imageUrl,
+    })
+    .from(orderItems)
+    .leftJoin(products, eq(orderItems.productId, products.id))
+    .where(eq(orderItems.orderId, id));
+
+  let address = null;
+  try { address = order[0].addressSnapshot ? JSON.parse(order[0].addressSnapshot) : null; } catch {}
+
+  return c.json({ success: true, data: { ...order[0], address, items } });
+});
+
+// ─── GET /admin/analytics ─────────────────────────────────────────────────────
+ordersRoute.get("/admin/analytics", authMiddleware, adminMiddleware, async (c) => {
+  const db = createDB(c.env.DB);
+
+  const allOrders = await db.select().from(orders);
+
+  // ── Totals ──────────────────────────────────────────────────────────────────
+  const totalRevenue = allOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const totalOrders = allOrders.length;
+  const avgOrderValue = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
+
+  // ── By status ───────────────────────────────────────────────────────────────
+  const byStatus: Record<string, number> = {};
+  for (const o of allOrders) {
+    const s = o.status ?? "pending";
+    byStatus[s] = (byStatus[s] || 0) + 1;
+  }
+
+  // ── This month vs last month ────────────────────────────────────────────────
+  const now = new Date();
+  const thisMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthStr = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, "0")}`;
+
+  let thisMonthRevenue = 0, thisMonthOrders = 0;
+  let lastMonthRevenue = 0, lastMonthOrders = 0;
+
+  for (const o of allOrders) {
+    const month = (o.createdAt ?? "").substring(0, 7);
+    if (month === thisMonthStr) { thisMonthRevenue += o.totalAmount; thisMonthOrders++; }
+    if (month === lastMonthStr) { lastMonthRevenue += o.totalAmount; lastMonthOrders++; }
+  }
+
+  const revenuePct = lastMonthRevenue > 0 ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100) : null;
+  const ordersPct = lastMonthOrders > 0 ? Math.round(((thisMonthOrders - lastMonthOrders) / lastMonthOrders) * 100) : null;
+
+  // ── Revenue by day (last 30 days) ────────────────────────────────────────────
+  const cutoff = new Date(now);
+  cutoff.setDate(cutoff.getDate() - 29);
+  const cutoffStr = cutoff.toISOString().substring(0, 10);
+
+  const revenueByDay: Record<string, number> = {};
+  // Pre-fill all 30 days with 0
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(cutoff);
+    d.setDate(d.getDate() + i);
+    revenueByDay[d.toISOString().substring(0, 10)] = 0;
+  }
+  for (const o of allOrders) {
+    const day = (o.createdAt ?? "").substring(0, 10);
+    if (day >= cutoffStr && revenueByDay[day] !== undefined) {
+      revenueByDay[day] += o.totalAmount;
+    }
+  }
+  const revenueChart = Object.entries(revenueByDay).map(([date, revenue]) => ({ date, revenue }));
+
+  // ── Order items ──────────────────────────────────────────────────────────────
+  const itemRows = await db
+    .select({
+      productId: orderItems.productId,
+      quantity: orderItems.quantity,
+      price: orderItems.price,
+      productName: products.name,
+      productImage: products.imageUrl,
+    })
+    .from(orderItems)
+    .leftJoin(products, eq(orderItems.productId, products.id));
+
+  // ── Top products by revenue ──────────────────────────────────────────────────
+  const productMap: Record<number, { name: string; image: string; revenue: number; units: number }> = {};
+  for (const row of itemRows) {
+    if (!row.productId) continue;
+    if (!productMap[row.productId]) {
+      productMap[row.productId] = { name: row.productName ?? "", image: row.productImage ?? "", revenue: 0, units: 0 };
+    }
+    productMap[row.productId].revenue += row.price * row.quantity;
+    productMap[row.productId].units += row.quantity;
+  }
+  const topProducts = Object.entries(productMap)
+    .map(([id, data]) => ({ productId: Number(id), ...data }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5);
+
+  // ── Unique + repeat customers ────────────────────────────────────────────────
+  const customerOrderCounts: Record<string, number> = {};
+  for (const o of allOrders) {
+    customerOrderCounts[o.clerkUserId] = (customerOrderCounts[o.clerkUserId] || 0) + 1;
+  }
+  const uniqueCustomers = Object.keys(customerOrderCounts).length;
+  const repeatCustomers = Object.values(customerOrderCounts).filter((n) => n > 1).length;
+
+  // ── Low stock products (< 5) ─────────────────────────────────────────────────
+  const allProducts = await db.select().from(products);
+  const lowStock = allProducts
+    .filter((p) => (p.stock ?? 0) < 5)
+    .map((p) => ({ id: p.id, name: p.name, stock: p.stock ?? 0, image: p.imageUrl }))
+    .sort((a, b) => a.stock - b.stock);
+
+  // ── Most wishlisted ──────────────────────────────────────────────────────────
+  const wishlistRows = await db
+    .select({
+      productId: wishlists.productId,
+      productName: products.name,
+      productImage: products.imageUrl,
+    })
+    .from(wishlists)
+    .leftJoin(products, eq(wishlists.productId, products.id));
+
+  const wishlistMap: Record<number, { name: string; image: string; count: number }> = {};
+  for (const row of wishlistRows) {
+    if (!row.productId) continue;
+    if (!wishlistMap[row.productId]) {
+      wishlistMap[row.productId] = { name: row.productName ?? "", image: row.productImage ?? "", count: 0 };
+    }
+    wishlistMap[row.productId].count++;
+  }
+  const mostWishlisted = Object.entries(wishlistMap)
+    .map(([id, data]) => ({ productId: Number(id), ...data }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
+  return c.json({
+    success: true,
+    data: {
+      totalRevenue, totalOrders, avgOrderValue, byStatus,
+      thisMonth: { revenue: thisMonthRevenue, orders: thisMonthOrders },
+      lastMonth: { revenue: lastMonthRevenue, orders: lastMonthOrders },
+      revenuePct, ordersPct,
+      revenueChart,
+      topProducts,
+      uniqueCustomers, repeatCustomers,
+      lowStock,
+      mostWishlisted,
+    },
+  });
+});
+
 // ─── GET /admin/all ───────────────────────────────────────────────────────────
 ordersRoute.get("/admin/all", authMiddleware, adminMiddleware, async (c) => {
   const db = createDB(c.env.DB);
@@ -223,6 +388,32 @@ ordersRoute.get("/admin/all", authMiddleware, adminMiddleware, async (c) => {
     .from(orders)
     .orderBy(desc(orders.createdAt));
   return c.json({ success: true, data: allOrders });
+});
+
+// ─── GET /admin/:id/details ──────────────────────────────────────────────────
+ordersRoute.get("/admin/:id/details", authMiddleware, adminMiddleware, async (c) => {
+  const id = Number(c.req.param("id"));
+  const db = createDB(c.env.DB);
+
+  const order = await db.select().from(orders).where(eq(orders.id, id));
+  if (!order[0]) return c.json({ success: false, message: "Order not found" }, 404);
+
+  const items = await db
+    .select({
+      productId: orderItems.productId,
+      quantity: orderItems.quantity,
+      price: orderItems.price,
+      productName: products.name,
+      productImage: products.imageUrl,
+    })
+    .from(orderItems)
+    .leftJoin(products, eq(orderItems.productId, products.id))
+    .where(eq(orderItems.orderId, id));
+
+  let address = null;
+  try { address = order[0].addressSnapshot ? JSON.parse(order[0].addressSnapshot) : null; } catch {}
+
+  return c.json({ success: true, data: { ...order[0], address, items } });
 });
 
 // ─── PUT /admin/:id/status ────────────────────────────────────────────────────

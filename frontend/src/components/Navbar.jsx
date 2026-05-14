@@ -5,7 +5,7 @@ import {
 import {
   useUser,
 } from "@clerk/clerk-react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 import {
   Heart,
@@ -214,58 +214,54 @@ const { user } =
           >
 
             <li>
-              <Link
+              <NavLink
                 to="/"
-                onClick={
-                  closeMenu
-                }
+                end
+                className={({ isActive }) => isActive ? "nav-link-active" : ""}
+                onClick={closeMenu}
               >
                 Home
-              </Link>
+              </NavLink>
             </li>
 
             <li>
-              <Link
+              <NavLink
                 to="/philosophy"
-                onClick={
-                  closeMenu
-                }
+                className={({ isActive }) => isActive ? "nav-link-active" : ""}
+                onClick={closeMenu}
               >
                 Philosophy
-              </Link>
+              </NavLink>
             </li>
 
             <li>
-              <Link
+              <NavLink
                 to="/collection"
-                onClick={
-                  closeMenu
-                }
+                className={({ isActive }) => isActive ? "nav-link-active" : ""}
+                onClick={closeMenu}
               >
                 Collection
-              </Link>
+              </NavLink>
             </li>
 
             <li>
-              <Link
+              <NavLink
                 to="/wishlist"
-                onClick={
-                  closeMenu
-                }
+                className={({ isActive }) => isActive ? "nav-link-active" : ""}
+                onClick={closeMenu}
               >
                 Wishlist
-              </Link>
+              </NavLink>
             </li>
 
             <li>
-              <Link
+              <NavLink
                 to="/myorders"
-                onClick={
-                  closeMenu
-                }
+                className={({ isActive }) => isActive ? "nav-link-active" : ""}
+                onClick={closeMenu}
               >
                 My Orders
-              </Link>
+              </NavLink>
             </li>
 
             {user?.publicMetadata?.role === "admin" && (
@@ -319,37 +315,6 @@ const { user } =
 
           </Link>
 
-          {/* AUTH */}
-          <SignedOut>
-
-            <SignInButton mode="modal">
-
-              <button
-                className="signin-btn"
-              >
-
-                Sign In
-
-              </button>
-
-            </SignInButton>
-
-          </SignedOut>
-
-          <SignedIn>
-
-         <Link to="/account">
-
-  <img
-    src={user?.imageUrl}
-    alt="profile"
-    className="navbar-profile"
-  />
-
-</Link>
-
-          </SignedIn>
-
           {/* CART */}
           <button
             className="cart-btn"
@@ -388,6 +353,33 @@ const { user } =
             </span>
 
           </button>
+
+          {/* AUTH */}
+          <SignedOut>
+
+            <SignInButton mode="modal">
+
+              <button
+                className="signin-btn"
+              >
+
+                Sign In
+
+              </button>
+
+            </SignInButton>
+
+          </SignedOut>
+
+          <SignedIn>
+            <Link to="/account">
+              <img
+                src={user?.imageUrl}
+                alt="profile"
+                className="navbar-profile"
+              />
+            </Link>
+          </SignedIn>
 
           {/* MOBILE */}
           <button
